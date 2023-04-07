@@ -37,9 +37,9 @@ class DatadogCompoundMetrics
 
   def self.schedule_job
     Sidekiq::Cron::Job.create(
-      name: "DatadogCompoundMetrics::CompoundMetricWorker",
+      name: "DatadogCompoundMetrics::CompoundMetricsWorker",
       cron: configuration.sidekiq_cron_schedule,
-      class: "DatadogCompoundMetrics::CompoundMetricWorker",
+      class: "DatadogCompoundMetrics::CompoundMetricsWorker",
       queue: configuration.sidekiq_queue,
       args: [],
       active_job: false

@@ -72,9 +72,9 @@ RSpec.describe DatadogCompoundMetrics do
         schedule_job
       end.to change { Sidekiq::Cron::Job.all.count }.from(0).to(1)
 
-      expect(created_job.name).to eq("DatadogCompoundMetrics::CompoundMetricWorker")
+      expect(created_job.name).to eq("DatadogCompoundMetrics::CompoundMetricsWorker")
       expect(created_job.cron).to eq("*/10 * * * * *")
-      expect(created_job.klass).to eq("DatadogCompoundMetrics::CompoundMetricWorker")
+      expect(created_job.klass).to eq("DatadogCompoundMetrics::CompoundMetricsWorker")
       expect(created_job.queue_name_with_prefix).to eq("critical")
       expect(created_job.args).to eq([])
       expect(created_job).not_to be_is_active_job
