@@ -23,7 +23,7 @@ Rails.application.config.to_prepare do
   DatadogCompoundMetrics.configure do |config|
     config.datadog_statsd_client = Datadog::Statsd.new(ENV.fetch("DD_AGENT_HOST"), ENV.fetch("DATADOG_PORT"), namespace: "app_name.production", tags: ["host:disabled"]) # required
     config.sidekiq_queue = :critical # required
-    config.sidekiq_queue = "*/10 * * * * *" # required, you can also use extended syntax covering seconds
+    config.sidekiq_cron_schedule = "*/10 * * * * *" # required, you can also use extended syntax covering seconds
   end
 
   DatadogCompoundMetrics.add_compound_metric("sidekiq.autoscaling.high_concurrency_worker") do |compound_metric|
