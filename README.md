@@ -21,7 +21,7 @@ In the initializer:
 ``` rb
 Rails.application.config.to_prepare do
   DatadogCompoundMetrics.configure do |config|
-    condif.datadog_statsd_client = Datadog::Statsd.new(ENV.fetch("DD_AGENT_HOST"), ENV.fetch("DATADOG_PORT"), namespace: "app_name.production", tags: ["host:none"]) # required
+    condif.datadog_statsd_client = Datadog::Statsd.new(ENV.fetch("DD_AGENT_HOST"), ENV.fetch("DATADOG_PORT"), namespace: "app_name.production", tags: ["host:disabled"]) # required
     config.sidekiq_queue = :critical # required
     config.sidekiq_queue = "*/10 * * * * *" # required, you can also use extended syntax covering seconds
   end
@@ -32,11 +32,11 @@ Rails.application.config.to_prepare do
     # to have a single metric taking the maximum from these latencies:
     compound_metric.calculation_strategy = :max # :min/:max, in the end it's going to be a method call on the Array
   end
-  
+
   DatadogCompoundMetrics.schedule_job # add it to cron jobs
 end
 
-# rememeber also to tweak cron poll interval if you are planning to use extended syntax covering seconds and schedule jobs more often
+# remember also to tweak cron poll interval if you are planning to use extended syntax covering seconds and schedule jobs more often
 Sidekiq::Options[:cron_poll_interval] = 10
 ```
 
