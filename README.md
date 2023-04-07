@@ -1,24 +1,45 @@
-# Datadog::Compound::Metrics
+# DatadogCompoundMetrics
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/datadog/compound/metrics`. To experiment with that code, run `bin/console` for an interactive prompt.
+A gem for building compound metric (a single metric from multiple ones). Mostly to have a single metric do Horizontal Pod Autoscaling for workers consuming from multiple queues.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+    $ bundle add datadog-compound-metrics
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+    $ gem install datadog-compound-metrics
 
 ## Usage
 
-TODO: Write usage instructions here
+
+In the initializer:
+
+
+``` rb
+Rails.application.config.to_prepare do
+  DatadogCompoundMetrics.configure do |config|
+    condif.datadog_statsd_client = Datadog::Statsd.new(ENV.fetch("DD_AGENT_HOST"), ENV.fetch("DATADOG_PORT"), namespace: "app_name.production", tags: ["host:none"]) # required
+    config.sidekiq_queue = :critical # required
+    config.sidekiq_queue = "*/10 * * * * *" # required, you can also use extended syntax covering seconds
+  end
+
+  DatadogCompoundMetrics.add_compound_metric("sidekiq.autoscaling.high_concurrency_worker") do |compound_metric|
+    compound_metric.add_calculation(-> { Sidekiq::Queue.new("queue_1").latency })
+    compound_metric.add_calculation(-> { Sidekiq::Queue.new("queue_2").latency })
+    # to have a single metric taking the maximum from these latencies:
+    compound_metric.calculation_strategy = :max # :min/:max, in the end it's going to be a method call on the Array
+  end
+  
+  DatadogCompoundMetrics.schedule_job # add it to cron jobs
+end
+
+# rememeber also to tweak cron poll interval if you are planning to use extended syntax covering seconds and schedule jobs more often
+Sidekiq::Options[:cron_poll_interval] = 10
+```
+
 
 ## Development
 
@@ -28,7 +49,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/datadog-compound-metrics.
+Bug reports and pull requests are welcome on GitHub at https://github.com/BookingSync/datadog-compound-metrics.
 
 ## License
 
