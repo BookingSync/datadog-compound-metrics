@@ -33,11 +33,15 @@ Rails.application.config.to_prepare do
     compound_metric.calculation_strategy = :max # :min/:max, in the end it's going to be a method call on the Array
   end
 
-  DatadogCompoundMetrics.schedule_job # add it to cron jobs
-end
 
-# remember also to tweak cron poll interval if you are planning to use extended syntax covering seconds and schedule jobs more often
-Sidekiq::Options[:cron_poll_interval] = 10
+  Sidekiq.configure_server do |config|
+    config.on(:startup) do
+      DatadogCompoundMetrics.schedule_job # add it to cron jobs
+    end
+  end
+  # remember also to tweak cron poll interval if you are planning to use extended syntax covering seconds and schedule jobs more often
+  Sidekiq::Options[:cron_poll_interval] = 10
+end
 ```
 
 
