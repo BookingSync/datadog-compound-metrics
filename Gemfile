@@ -13,4 +13,4 @@ gem "rubocop", require: false
 gem "rubocop-performance"
 gem "rubocop-rake"
 gem "rubocop-rspec"
-gem "sidekiq", "~> 6.0"
+gem "sidekiq", "~> 7.0"
