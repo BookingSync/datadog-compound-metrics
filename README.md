@@ -27,7 +27,7 @@ Rails.application.config.to_prepare do
     config.sidekiq_cron_schedule = "*/10 * * * * *" # required, you can also use extended syntax covering seconds
   end
 
-  DatadogCompoundMetrics.add_compound_metric("sidekiq.autoscaling.high_concurrency_worker") do |compound_metric|
+  DatadogCompoundMetrics.add_compound_metric("autoscaling.high_concurrency_worker") do |compound_metric|
     compound_metric.add_calculation(-> { Sidekiq::Queue.new("queue_1").latency })
     compound_metric.add_calculation(-> { Sidekiq::Queue.new("queue_2").latency })
     # to have a single metric taking the maximum from these latencies:
